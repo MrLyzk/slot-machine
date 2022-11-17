@@ -72,7 +72,7 @@ def print_slot_machine(columns):
 
 def deposit():
     while True:
-        amount = input("How much do you want to deposit: $")
+        amount = input("How much do you want to deposit: $").strip()
         if amount.isdigit():
             amount = int(amount)
             if amount > 0:
@@ -116,15 +116,19 @@ def get_bet():
 
 
 def spin(balance):
-    lines = get_number_of_lines()
     while True:
-        bet = get_bet()
-        total = bet * lines
-        if balance >= total:
+        lines = get_number_of_lines()
+        while True:
+            bet = get_bet()
+            total = bet * lines
+            if balance >= total:
+                break
+            else:
+                print("Insufficient balance ($" + str(balance) + "), please bet lower amount.")
+        print(f"You are betting ${bet} on {lines} lines. Total bet is equal to ${total}")
+        answer = input("If you want to change bet options, choose 'c', otherwise press enter to spin\n")
+        if answer != "c":
             break
-        else:
-            print("Insufficient balance ($" + str(balance) + "), please bet lower amount.")
-    print(f"You are betting ${bet} on {lines} lines. Total bet is equal to ${total}")
 
     slots = get_slot_machine_spin(ROWS, COLS, symbol_count)
     print_slot_machine(slots)
@@ -138,7 +142,15 @@ def main():
     balance = deposit()
     while True:
         print(f"Current balance is ${balance}")
-        answer = input("Press enter to play (q to quit).")
+        while balance <= 0:
+            print(f"Your balance is ${balance}, in order to play again you need to deposit more money")
+            answer = input("Press 'a' to add funds (q to quit)\n")
+            if answer == "q":
+                break
+            elif answer == "a":
+                balance += deposit()
+        else:
+            answer = input("Press enter to play (q to quit or a to add funds). ")
         if answer == "q":
             break
         balance += spin(balance)
